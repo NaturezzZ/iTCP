@@ -6,7 +6,10 @@
 #ifndef __ITCP_PACKETIO_H
 #define __ITCP_PACKETIO_H
 #include <netinet/ether.h>
+#include "core.h"
 
+std::pair<uint8_t*, uint32_t> constructFrame(const void* buf, int len, 
+    int ethtype, const void* destmac, int id);
 /** 
  * @brief Encapsulate some data into an Ethernet II frame and send it.
  *
