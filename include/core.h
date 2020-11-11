@@ -1,7 +1,7 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-02 22:12:15
- * @LastEditTime: 2020-11-05 00:58:16
+ * @LastEditTime: 2020-11-11 00:53:15
  * @LastEditors: Naiqian
  * @Description: 
  */
@@ -18,6 +18,21 @@
 typedef std::string deviceName_t;
 typedef uint8_t* mac_t;
 typedef uint32_t deviceID_t;
+typedef uint32_t ipv4_t;
+typedef std::pair<ipv4_t, ip_t> rtKey_t;
+typedef std::pair<deviceID_t, mac_t> rtValue_t;
+typedef std::map<rtKey_t, rtValue_t> rtTable_t;
+
+ipv4_t ptr2ip_t(uint8_t* ptr){
+    ipv4_t ret = *((ipv4_t*) ptr);
+    return ret;
+}
+void ip_t2ptr(ipv4_t ip, uint8_t* ptr){
+    if(!ptr) ptr = new uint8_t[4];
+    *((ipv4_t*)ptr) = ip;
+    return;
+}
+
 class device_t{
 public:
     mac_t Mac;

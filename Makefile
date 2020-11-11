@@ -6,7 +6,7 @@ INCLUDES= -I./include
 
 # user modify: target and objects
 EXENAME = test.out
-OBJECTS	= obj/utils.o obj/packetio.o obj/core.o obj/device.o obj/main.o 
+OBJECTS	= obj/utils.o obj/packetio.o obj/core.o obj/device.o obj/main.o obj/ip.cc
 
 # make target
 all:${OBJECTS}
@@ -29,4 +29,6 @@ obj/core.o : src/core.cc
 	${CC} ${CFLAGS} ${INCLUDES} -c src/core.cc -o obj/core.o -lpcap
 obj/utils.o : src/utils.cc
 	${CC} ${CFLAGS} ${INCLUDES} -c src/utils.cc -o obj/utils.o -lpcap
+obj/utils.o : src/ip.cc src/core.cc
+	${CC} ${CFLAGS} ${INCLUDES} -c src/ip.cc -o obj/ip.o
 
