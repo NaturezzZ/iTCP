@@ -1,7 +1,7 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-02 19:03:09
- * @LastEditTime: 2020-11-05 00:56:11
+ * @LastEditTime: 2020-11-15 20:24:58
  * @LastEditors: Naiqian
  * @Description: 
  */
@@ -31,19 +31,20 @@ std::pair<uint8_t*, uint32_t> constructFrame(const void* buf, int len, int ethty
    memcpy(frameBuffer, ethHdr, sizeof(eth_hdr_t));
    memcpy(frameBuffer+sizeof(eth_hdr_t), buf, len);
    memcpy(frameBuffer+sizeof(eth_hdr_t)+len, checkSum, 4);
-
-   std::cerr << "Constructing frame on " << device.Name << std::endl;
+   //std::cerr << "Constructing frame on " << device.Name << std::endl;
    return std::make_pair(frameBuffer, frame_len);
 }
 
-int send_frame(const void *buf, int len, int ethtype, const void *destmac,int id){
+int sendFrame(const void *buf, int len, int ethtype, const void *destmac,int id){
    std::pair<uint8_t*, uint32_t> sentFrame = constructFrame(buf, len, ethtype, destmac, id);
+   //for(int i = 0;i < len; i++)
+   // fprintf(stderr, "%x\n", *((uint8_t*)buf+i));
    int sentResult = iTCP_kernel.getDevice(id).sendFrame(sentFrame.first, sentFrame.second);
    if(sentFrame.first) delete[] sentFrame.first;
    return sentResult;
 }
 
 int setFrameReceiveCallback(frameReceiveCallback callback){
-   iTCP_kernel.getCallback() = callback;
+   iTCP_kernel.getEthCallback() = callback;
    return 0;
 }
