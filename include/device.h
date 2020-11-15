@@ -1,3 +1,11 @@
+/*
+ * @Author: Naiqian
+ * @Date: 2020-11-02 19:02:34
+ * @LastEditTime: 2020-11-14 01:23:05
+ * @LastEditors: Naiqian
+ * @Description: 
+ * @FilePath: /iTCP/include/device.h
+ */
 /** 
  * @file device.h
  * @brief Library supporting network device management.
@@ -12,7 +20,7 @@
  * @return A non-negative _device-ID_ on success, -1 on error.
  */
 int addDevice(const char* device);
-
+int addAll();
 /**
  * Find a device added by `addDevice`.
  *
