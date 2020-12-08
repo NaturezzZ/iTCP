@@ -1,10 +1,10 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-14 00:02:22
- * @LastEditTime: 2020-12-09 04:16:01
+ * @LastEditTime: 2020-12-09 03:44:45
  * @LastEditors: Naiqian
  * @Description: 
- * @FilePath: /iTCP/src/daemon.cc
+ * @FilePath: /iTCP/src/recver.cc
  */
 
 #include "include.h"
@@ -58,7 +58,8 @@ void processIPPacket(){
 }
 
 void work(){
-    sleep(15);
+    sleep(10);
+    fprintf(stderr, "[INFO] Start testing\n");
     std::thread processip(processIPPacket);
     processip.detach();
 
@@ -77,7 +78,7 @@ void work(){
     connfd = __wrap_accept(fd, sock, tmp);
     uint8_t *readfile1 = new uint8_t[1001];
     __wrap_read(connfd, (void*)readfile1, 2002);
-    fprintf(stderr, "[TEST] Recieved message: 0x%x\n", *((uint32_t*)readfile1));
+    fprintf(stderr, "[TEST]%x\n", *((uint32_t*)readfile1));
     __wrap_close(connfd);
 }
 
@@ -98,10 +99,10 @@ int main(){
         //fprintf(stderr, "%d\n", t.get_id());
         t.detach();
     }
-    std::thread t(periodSendMyArp, (uint32_t)5);
+    std::thread t(periodSendMyArp, (uint32_t)3);
     
     
-    //std::thread th_work(work);
+    std::thread th_work(work);
 
     while(1){
         recvPcap tmp = q.pop();
@@ -109,7 +110,7 @@ int main(){
     }
     
     t.detach();
-    //th_work.detach();
+    th_work.detach();
     // std::thread processip(processIPPacket);
     // processip.detach();
 

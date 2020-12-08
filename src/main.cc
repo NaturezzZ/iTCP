@@ -1,7 +1,7 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-04 17:07:54
- * @LastEditTime: 2020-11-14 23:32:12
+ * @LastEditTime: 2020-12-09 03:20:17
  * @LastEditors: Naiqian
  * @Description: 
  */
@@ -65,7 +65,7 @@ int main(){
     //routingTableop.setRoutingTable(tmp, mask, nem, "veth3-4");
     while(1){
         struct pcap_pkthdr header;
-        cerr << "AHFKJDAHSKJDFHASK" << endl;
+        //cerr << "AHFKJDAHSKJDFHASK" << endl;
         //for(int i = 0; i < deviceNum; i++){
         packet = pcap_next(handle, &header);
         iTCP_kernel.eth_callback(packet, header.len, 0);

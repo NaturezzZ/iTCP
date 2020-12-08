@@ -1,7 +1,7 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-02 19:16:18
- * @LastEditTime: 2020-11-15 12:22:10
+ * @LastEditTime: 2020-12-08 01:47:31
  * @LastEditors: Naiqian
  * @Description: 
  */
@@ -30,6 +30,8 @@ typedef unsigned short uint16_t;
 #define IPV6 2
 typedef std::string deviceName_t;
 
+#define TCP_CLIENT 1
+#define TCP_SERVER 0
 //using mac_t = uint8_t*;
 
 typedef uint8_t* mac_t;
@@ -103,7 +105,7 @@ uint16_t change_Endian(uint16_t x);
 #include <random>
 #include <thread>
 #include <vector>
-
+//#define mac
 template <typename T>
 class BlockingQueue {
     std::mutex              _mutex;
@@ -116,8 +118,12 @@ class BlockingQueue {
 
     public:
     BlockingQueue(const BlockingQueue<T>& other) = delete;
+    // BlockingQueue(const BlockingQueue<T>& other){
+
+    // }
     BlockingQueue<T>& operator=(const BlockingQueue<T>& other) = delete;
     BlockingQueue(int capacity) : _capacity(capacity), _vt(capacity + 1), _start(0), _end(0) {}
+    BlockingQueue() : _capacity(2000), _vt(2000 + 1), _start(0), _end(0) {}
 
     bool isempty() {
         return _end == _start;

@@ -1,7 +1,7 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-09 20:25:42
- * @LastEditTime: 2020-11-15 21:23:16
+ * @LastEditTime: 2020-12-08 18:52:42
  * @LastEditors: Naiqian
  * @Description: 
  */
@@ -99,6 +99,7 @@ int setIPPacketReceiveCallback(IPPacketReceiveCallback callback){
 
 // callback function of layer 2
 int recvFrame(const void* buf, int len, int id){
+    
     uint8_t * ethHdr = new uint8_t[sizeof(eth_hdr_t)];
     uint8_t * ethPayload = new uint8_t[len - sizeof(eth_hdr_t) - 4];
     uint8_t * ethCheckSum = new uint8_t[4];
@@ -116,20 +117,23 @@ int recvFrame(const void* buf, int len, int id){
     uint8_t ipTtl = ((ipHdr_t*)ethPayload)->ttl;
     uint8_t * frag = (uint8_t*)&(((ipHdr_t*)ethPayload)->part2);
     frag += 16;
-    if( *((uint16_t*) frag) != 0) return 0;
+    //if( *((uint16_t*) frag) != 0) return 0;
     uint8_t ipProtocol = ((ipHdr_t*)ethPayload)->protocol;
     uint8_t *ipPayload = (ethPayload+sizeof(ipHdr_t));
     int ipPayloadLen = len - sizeof(eth_hdr_t) - 4 - sizeof(ipHdr_t);
     bool reachDst = 0;
+    //cerr << "????" << endl;
     for(int i = 0; i < iTCP_kernel.currDevice.size(); i++){
         ipv4_t deviceIP = iTCP_kernel.currDevice[id].IP;
         if(deviceIP == ipDst) reachDst = 1;
     }
+    //cerr << reachDst << "????" << endl;
     if(reachDst == 1){
         //successfully received a packet, ip callback
         fprintf(stderr, "[INFO] %s recieved a destinated packet\n", iTCP_kernel.currDevice[id].Name.c_str());
+        //iTCP_kernel.getIPCallback()(NULL, 0);
         iTCP_kernel.getIPCallback()(ethPayload, (int)(len - sizeof(eth_hdr_t) - 4));
-        
+        //fprintf(stderr, "adfasd\n");
     }
     else if(ipProtocol == L3_MYARP){
         //myArp routing
@@ -138,7 +142,7 @@ int recvFrame(const void* buf, int len, int id){
     }
     else{
         //forward
-        fprintf(stderr, "[INFO] %s recieved a forwarding packet\n", iTCP_kernel.currDevice[id].Name.c_str());
+        //fprintf(stderr, "[INFO] %s recieved a forwarding packet\n", iTCP_kernel.currDevice[id].Name.c_str());
         forward(ipSrc, ipDst, ipProtocol, ipPayload, ipPayloadLen, ipTtl);
     }
     return 0;

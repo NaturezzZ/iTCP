@@ -2,11 +2,14 @@
  * @file socket.h
  * @brief POSIX-compatible socket library supporting TCP protocol on IPv4.
  */
- 
+#ifndef __ITCP_SOCKET_H
+#define __ITCP_SOCKET_H
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-
+/*
+ kernel 中有个vector记录当前的所有套接字
+ */
 /**
  * @see [POSIX.1-2017:socket](http://pubs.opengroup.org/onlinepubs/
  * 9699919799/functions/socket.html)
@@ -65,3 +68,4 @@ int __wrap_close(int fildes);
 int __wrap_getaddrinfo(const char *node, const char *service,
     const struct addrinfo *hints,
     struct addrinfo **res);
+#endif

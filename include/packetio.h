@@ -1,3 +1,11 @@
+/*
+ * @Author: Naiqian
+ * @Date: 2020-11-02 19:03:04
+ * @LastEditTime: 2020-12-07 02:45:47
+ * @LastEditors: Naiqian
+ * @Description: 
+ * @FilePath: /iTCP/include/packetio.h
+ */
 /** 
  * @file packetio.h
  * @brief Library supporting sending/receiving Ethernet II frames.
@@ -5,7 +13,9 @@
 
 #ifndef __ITCP_PACKETIO_H
 #define __ITCP_PACKETIO_H
+#ifndef mac
 #include <netinet/ether.h>
+#endif
 #include "core.h"
 
 std::pair<uint8_t*, uint32_t> constructFrame(const void* buf, int len, 

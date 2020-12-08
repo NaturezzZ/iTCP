@@ -1,10 +1,10 @@
 /*
  * @Author: Naiqian
  * @Date: 2020-11-14 00:02:22
- * @LastEditTime: 2020-12-09 04:16:01
+ * @LastEditTime: 2020-12-09 03:51:17
  * @LastEditors: Naiqian
  * @Description: 
- * @FilePath: /iTCP/src/daemon.cc
+ * @FilePath: /iTCP/src/sender.cc
  */
 
 #include "include.h"
@@ -58,27 +58,30 @@ void processIPPacket(){
 }
 
 void work(){
-    sleep(15);
+    sleep(10);
+    fprintf(stderr, "[INFO] Start testing\n");
     std::thread processip(processIPPacket);
     processip.detach();
 
     int fd = __wrap_socket(AF_INET, SOCK_STREAM, 0);
-    //fprintf(stderr, "%d", fd);
     sockaddr * sock = new sockaddr;
-    uint8_t srcipp[4] = {10,100,2,2};
+    uint8_t srcipp[4] = {10,100,2,1};
+    uint8_t dstipp[4] = {10,100,2,2};
     
     ((tuple4*)(sock->sa_data))->srcIP = ptr2ip_t(srcipp);
-    ((tuple4*)(sock->sa_data))->srcPort = h2n((uint16_t)10000);
-    //fprintf(stderr, "checkbind:%d\n", ((tuple4*)(sock->sa_data))->srcPort);
-    __wrap_bind(fd, sock, sizeof(sockaddr));
-    uint32_t* tmp = new uint32_t;
-    *tmp = sizeof(sockaddr);
-    int connfd;
-    connfd = __wrap_accept(fd, sock, tmp);
-    uint8_t *readfile1 = new uint8_t[1001];
-    __wrap_read(connfd, (void*)readfile1, 2002);
-    fprintf(stderr, "[TEST] Recieved message: 0x%x\n", *((uint32_t*)readfile1));
-    __wrap_close(connfd);
+    ((tuple4*)(sock->sa_data))->srcPort = h2n(10000);
+    ((tuple4*)(sock->sa_data))->dstIP = ptr2ip_t(dstipp);
+    ((tuple4*)(sock->sa_data))->dstPort = h2n(10000);
+
+    __wrap_connect(fd, sock, sizeof(sockaddr));
+
+    //cerr << "connect finished "<< (*(iTCP_kernel.socket_set.find(fd))).second->tcb->status << endl;
+    uint8_t* writefile = new uint8_t[1001];
+    *((uint32_t*)writefile) = 0x12345678UL;
+    __wrap_write(fd, writefile, 1001);
+    __wrap_write(fd, writefile, 1001);
+    __wrap_close(fd);
+    return;
 }
 
 int main(){
@@ -86,37 +89,31 @@ int main(){
     setFrameReceiveCallback(recvFrame);
     //IPPacketReceiveCallback
     setIPPacketReceiveCallback(recvIPPacket);
-    
     //setIPPacketReceiveCallback()
-    
+    uint8_t ip2[4] = {10, 100, 2, 2};
+    uint8_t mask2[4] = {255, 255, 255, 255};
+    uint8_t mac2[6] = {0x82,0xf3,0xa8,0x60,0x27,0xfd};
+    in_addr ip22; ip22.s_addr = ptr2ip_t(ip2);
+    in_addr mask22; mask22.s_addr = ptr2ip_t(mask2);
+    const char devicename[20] = "veth2-3";
+    routingTableop.setRoutingTable(ip22, mask22, mac2, devicename, 1024);
     BlockingQueue<recvPcap> q(1024);
-    //fprintf(stderr, "%d\n", deviceNum);
+    
     for(int i = 0; i < deviceNum; i++){
-        //fprintf(stderr, "%d\n", deviceNum);
-        std::thread t(recvPcapPacket, std::ref(q), i);
-        
-        //fprintf(stderr, "%d\n", t.get_id());
+        std::thread t(recvPcapPacket, std::ref(q), i);    
         t.detach();
     }
-    std::thread t(periodSendMyArp, (uint32_t)5);
+    std::thread t(periodSendMyArp, (uint32_t)3);
     
-    
-    //std::thread th_work(work);
+    std::thread th_work(work);
 
     while(1){
         recvPcap tmp = q.pop();
         iTCP_kernel.getEthCallback()(tmp.packet, tmp.len, tmp.ID);
     }
-    
     t.detach();
-    //th_work.detach();
-    // std::thread processip(processIPPacket);
-    // processip.detach();
+    th_work.detach();
 
-    
-    // int fd = __wrap_socket(AF_INET, SOCK_STREAM, 0);
-    // fprintf(stderr, "%d", fd);
-    // while(1)
 
     return 0;
 }
